@@ -57,7 +57,7 @@ const ADHDLogo = () => (
 
 const navList = [
   { name: "Home", path: "/" },
-  { name: "About us", path: "/about-us" },
+  { name: "ADHD Resources", path: "/about-us" },
   { name: "Privacy Policy", path: "/privacy-policy" },
   { name: "ADHD Test", path: "/adhd-test" },
 ];
