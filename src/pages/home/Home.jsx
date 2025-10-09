@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
 import { Brain, Sparkles, Target, Zap, Calendar, Bell } from "lucide-react";
-import Blogs from "../blogs/Blogs";
+
 
 const Home = () => {
   const features = [
@@ -287,8 +287,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Blogs Section */}
-      <Blogs />
+      
     </>
   );
 };

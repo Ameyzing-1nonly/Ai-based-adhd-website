@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
 import defaultImg from "../assets/default-img.jpg"
 import {
   IoMenuOutline,
@@ -8,8 +7,6 @@ import {
   IoSunnyOutline,
   IoCloseOutline,
 } from "react-icons/io5";
-import { useLogOutUserMutation } from "../redux/features/auth/authApi";
-import { logout } from "../redux/features/auth/authSlice";
 
 const ADHDLogo = () => (
   <svg
@@ -63,11 +60,12 @@ const navList = [
 ];
 
 const Navbar = () => {
-  const { user } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  // Replace Redux user state with local state or context
+  // For now, setting user to null (not logged in)
+  const user = null; // You can replace this with useState or Context API later
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [logoutUser] = useLogOutUserMutation();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDarkMode = () => {
@@ -85,8 +83,11 @@ const Navbar = () => {
 
   const handleLogOut = async () => {
     try {
-      await logoutUser().unwrap();
-      dispatch(logout());
+      // Add your logout logic here (e.g., clear localStorage, call API)
+      console.log("User logged out");
+      // If you were storing user in localStorage:
+      // localStorage.removeItem('user');
+      // window.location.href = '/login';
     } catch (error) {
       console.log(error);
     }
