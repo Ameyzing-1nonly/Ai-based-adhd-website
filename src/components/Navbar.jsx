@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
-import defaultImg from "../assets/default-img.jpg"
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/authContext";
+import { doSignOut } from "../firebase/auth";
+import defaultImg from "../assets/default-img.jpg";
 import {
   IoMenuOutline,
   IoMoonOutline,
@@ -60,9 +62,8 @@ const navList = [
 ];
 
 const Navbar = () => {
-  // Replace Redux user state with local state or context
-  // For now, setting user to null (not logged in)
-  const user = null; // You can replace this with useState or Context API later
+  const { userLoggedIn, currentUser } = useAuth();
+  const navigate = useNavigate();
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -83,13 +84,11 @@ const Navbar = () => {
 
   const handleLogOut = async () => {
     try {
-      // Add your logout logic here (e.g., clear localStorage, call API)
-      console.log("User logged out");
-      // If you were storing user in localStorage:
-      // localStorage.removeItem('user');
-      // window.location.href = '/login';
+      await doSignOut();
+      navigate('/');
+      setIsMenuOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -115,44 +114,45 @@ const Navbar = () => {
             </li>
           ))}
 
-          {user ? (
+          {userLoggedIn ? (
             <>
-              {user.role === "user" && (
-                <li className="flex items-center gap-3">
-                  <img
-                    src={defaultImg}
-                    alt="default image"
-                    className="h-8 w-8 rounded-full"
-                  />
-                  <button
-                    onClick={handleLogOut}
-                    className="bg-pink-400 px-4 py-1.5 text-white rounded-sm"
-                  >
-                    LogOut
-                  </button>
-                </li>
-              )}
-
-              {user.role === "admin" && (
-                <li className="flex items-center gap-3">
-                  <img
-                    src={defaultImg}
-                    alt="default image"
-                    className="h-8 w-8 rounded-full"
-                  />
-                  <Link to="/dashboard">
-                    <button className="bg-pink-400 px-4 py-1.5 text-white rounded-sm">
-                      Dashboard
-                    </button>
-                  </Link>
-                </li>
-              )}
+              <li>
+                <NavLink
+                  to="/dashboard"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  Dashboard
+                </NavLink>
+              </li>
+              <li>
+                <button
+                  onClick={handleLogOut}
+                  className="text-gray-700 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
+                >
+                  Logout
+                </button>
+              </li>
+              <li>
+                <img
+                  src={currentUser?.photoURL || defaultImg}
+                  alt="user profile"
+                  className="h-8 w-8 rounded-full"
+                />
+              </li>
             </>
           ) : (
             <li>
               <NavLink
                 to="/login"
-                className="text-gray-700 dark:text-gray-300"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-pink-600 dark:text-pink-400"
+                    : "text-gray-700 dark:text-gray-300"
+                }
               >
                 Login
               </NavLink>
@@ -216,38 +216,27 @@ const Navbar = () => {
             </li>
           ))}
 
-          {user ? (
+          {userLoggedIn ? (
             <>
-              <li className="mt-5 px-4 flex items-center gap-3">
-                <img
-                  src={defaultImg}
-                  alt="default image"
-                  className="h-8 w-8 rounded-full"
-                />
-                <span className="text-gray-700 dark:text-gray-300">
-                  {user.name || "User"}
-                </span>
+              <li className="mt-5 px-4">
+                <NavLink
+                  to="/dashboard"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  Dashboard
+                </NavLink>
               </li>
-              {user.role === "admin" && (
-                <li className="mt-5 px-4">
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="bg-pink-400 px-4 py-1.5 text-white rounded-sm inline-block"
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-              )}
               <li className="mt-5 px-4">
                 <button
-                  onClick={() => {
-                    handleLogOut();
-                    setIsMenuOpen(false);
-                  }}
-                  className="bg-pink-400 px-4 py-1.5 text-white rounded-sm"
+                  onClick={handleLogOut}
+                  className="text-gray-700 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
                 >
-                  LogOut
+                  Logout
                 </button>
               </li>
             </>
@@ -256,7 +245,11 @@ const Navbar = () => {
               <NavLink
                 to="/login"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-gray-700 dark:text-gray-300"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-pink-600 dark:text-pink-400"
+                    : "text-gray-700 dark:text-gray-300"
+                }
               >
                 Login
               </NavLink>

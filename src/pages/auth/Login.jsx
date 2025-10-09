@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { doSignInWithEmailAndPassword, doSignInWithGoogle } from './auth';
-import {doSignInWithEmailAndPassword,doSignInWithGoogle} from '../auth/firebase';
-import { useAuth } from './contexts/authContext';
+import { Navigate } from 'react-router-dom';
+import { doSignInWithEmailAndPassword, doSignInWithGoogle, doCreateUserWithEmailAndPassword } from '../../firebase/auth';
+import { useAuth } from '../../contexts/authContext';
 
 function GoogleIcon({ className }) {
   return (
@@ -15,12 +15,26 @@ function GoogleIcon({ className }) {
 }
 
 const Login = () => {
-  const {userLoggedIn} = useAuth();
+  const { userLoggedIn } = useAuth();
   const [isActive, setIsActive] = useState(false);
   const [showPassword, setShowPassword] = useState({
     signUp: false,
     signIn: false
   });
+
+  // Sign In State
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [signInError, setSignInError] = useState('');
+
+  // Sign Up State
+  const [signUpName, setSignUpName] = useState('');
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [signUpError, setSignUpError] = useState('');
 
   const togglePasswordVisibility = (field) => {
     setShowPassword(prev => ({
@@ -29,18 +43,59 @@ const Login = () => {
     }));
   };
 
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    console.log('Sign in submitted');
+    if (!isSigningIn) {
+      setIsSigningIn(true);
+      setSignInError('');
+      try {
+        await doSignInWithEmailAndPassword(signInEmail, signInPassword);
+      } catch (error) {
+        setSignInError(error.message);
+        setIsSigningIn(false);
+      }
+    }
   };
 
-  const handleSignUpSubmit = (e) => {
+  const handleSignUpSubmit = async (e) => {
     e.preventDefault();
-    console.log('Sign up submitted');
+    if (!isSigningUp) {
+      setSignUpError('');
+      
+      // Check if passwords match
+      if (signUpPassword !== signUpConfirmPassword) {
+        setSignUpError('Passwords do not match');
+        return;
+      }
+      
+      setIsSigningUp(true);
+      try {
+        await doCreateUserWithEmailAndPassword(signUpEmail, signUpPassword);
+      } catch (error) {
+        setSignUpError(error.message);
+        setIsSigningUp(false);
+      }
+    }
+  };
+
+  const onGoogleSignIn = (e) => {
+    e.preventDefault();
+    if (!isSigningIn && !isSigningUp) {
+      setIsSigningIn(true);
+      setSignInError('');
+      setSignUpError('');
+      doSignInWithGoogle().catch(err => {
+        setSignInError(err.message);
+        setSignUpError(err.message);
+        setIsSigningIn(false);
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-gray-200 to-purple-200 flex items-center justify-center p-5">
+      {userLoggedIn && <Navigate to={'/dashboard'} replace={true} />}
+      
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
         
@@ -101,8 +156,13 @@ const Login = () => {
           transition: all 0.3s;
         }
 
-        .login-container button:hover {
+        .login-container button:hover:not(:disabled) {
           background-color: #6a2386;
+        }
+
+        .login-container button:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
         }
 
         .login-container button.hidden-btn {
@@ -153,6 +213,13 @@ const Login = () => {
           font-size: 18px;
           cursor: pointer;
           color: #d299e4;
+        }
+
+        .error-message {
+          color: #e74c3c;
+          font-size: 12px;
+          margin-top: 5px;
+          text-align: center;
         }
 
         .form-container {
@@ -212,6 +279,7 @@ const Login = () => {
           width: 40px;
           height: 40px;
           transition: all 0.3s;
+          cursor: pointer;
         }
 
         .social-icons a:hover {
@@ -290,7 +358,7 @@ const Login = () => {
           <form onSubmit={handleSignUpSubmit}>
             <h1>Create Account</h1>
             <div className="social-icons">
-              <a href="#" aria-label="Google">
+              <a onClick={onGoogleSignIn} aria-label="Google">
                 <GoogleIcon />
               </a>
               <a href="#" style={{ backgroundColor: '#1977F2' }} aria-label="Facebook">
@@ -310,12 +378,29 @@ const Login = () => {
               </a>
             </div>
             <span>or use your email for registration</span>
-            <input type="text" placeholder="Name" required />
-            <input type="email" placeholder="Email" required />
+            <input 
+              type="text" 
+              placeholder="Name" 
+              value={signUpName}
+              onChange={(e) => setSignUpName(e.target.value)}
+              required 
+            />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={signUpEmail}
+              onChange={(e) => setSignUpEmail(e.target.value)}
+              autoComplete="email"
+              required 
+            />
             <div className="password-container">
               <input
                 type={showPassword.signUp ? 'text' : 'password'}
                 placeholder="Password"
+                value={signUpPassword}
+                onChange={(e) => setSignUpPassword(e.target.value)}
+                autoComplete="new-password"
+                disabled={isSigningUp}
                 required
               />
               <span
@@ -325,7 +410,21 @@ const Login = () => {
                 {showPassword.signUp ? '👁️' : '👁️‍🗨️'}
               </span>
             </div>
-            <button type="submit">Sign Up</button>
+            <input 
+              type="password" 
+              placeholder="Confirm Password" 
+              value={signUpConfirmPassword}
+              onChange={(e) => setSignUpConfirmPassword(e.target.value)}
+              autoComplete="off"
+              disabled={isSigningUp}
+              required 
+            />
+            {signUpError && (
+              <div className="error-message">{signUpError}</div>
+            )}
+            <button type="submit" disabled={isSigningUp}>
+              {isSigningUp ? 'Signing Up...' : 'Sign Up'}
+            </button>
           </form>
         </div>
 
@@ -334,7 +433,7 @@ const Login = () => {
           <form onSubmit={handleSignInSubmit}>
             <h1>Sign In</h1>
             <div className="social-icons">
-              <a href="#" aria-label="Google">
+              <a onClick={onGoogleSignIn} aria-label="Google">
                 <GoogleIcon />
               </a>
               <a href="#" style={{ backgroundColor: '#1977F2' }} aria-label="Facebook">
@@ -354,11 +453,21 @@ const Login = () => {
               </a>
             </div>
             <span>or use your email password</span>
-            <input type="email" placeholder="Email" required />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={signInEmail}
+              onChange={(e) => setSignInEmail(e.target.value)}
+              autoComplete="email"
+              required 
+            />
             <div className="password-container">
               <input
                 type={showPassword.signIn ? 'text' : 'password'}
                 placeholder="Password"
+                value={signInPassword}
+                onChange={(e) => setSignInPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
               <span
@@ -368,8 +477,13 @@ const Login = () => {
                 {showPassword.signIn ? '👁️' : '👁️‍🗨️'}
               </span>
             </div>
+            {signInError && (
+              <div className="error-message">{signInError}</div>
+            )}
             <a href="#">Forgot Your Password?</a>
-            <button type="submit">Sign In</button>
+            <button type="submit" disabled={isSigningIn}>
+              {isSigningIn ? 'Signing In...' : 'Sign In'}
+            </button>
           </form>
         </div>
 
