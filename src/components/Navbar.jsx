@@ -57,7 +57,6 @@ const ADHDLogo = () => (
 const navList = [
   { name: "Home", path: "/" },
   { name: "ADHD Resources", path: "/about-us" },
-  { name: "Privacy Policy", path: "/privacy-policy" },
   { name: "ADHD Test", path: "/adhd-test" },
 ];
 
@@ -126,6 +125,42 @@ const Navbar = () => {
                   }
                 >
                   Dashboard
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/chat"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  AI Assistant
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/voice"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  Voice Tasks
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/games"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  Memory Games
                 </NavLink>
               </li>
               <li>
@@ -229,6 +264,45 @@ const Navbar = () => {
                   }
                 >
                   Dashboard
+                </NavLink>
+              </li>
+              <li className="mt-5 px-4">
+                <NavLink
+                  to="/chat"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  AI Assistant
+                </NavLink>
+              </li>
+              <li className="mt-5 px-4">
+                <NavLink
+                  to="/voice"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  Voice Tasks
+                </NavLink>
+              </li>
+              <li className="mt-5 px-4">
+                <NavLink
+                  to="/games"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-pink-600 dark:text-pink-400"
+                      : "text-gray-700 dark:text-gray-300"
+                  }
+                >
+                  Memory Games
                 </NavLink>
               </li>
               <li className="mt-5 px-4">
