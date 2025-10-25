@@ -3,7 +3,7 @@ import { Mic, MicOff, Sparkles, CheckCircle, Clock, AlertCircle, Trash2, Edit, P
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini
-const API_KEY = ""+import.meta.env.VITE_GEMINI_API_KEY+"";
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export default function VoiceTaskExtractorWithGemini() {
@@ -34,7 +34,7 @@ export default function VoiceTaskExtractorWithGemini() {
 
   const extractTasksWithGemini = async (text) => {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" });
       
       const prompt = `You are an AI task extraction specialist for ADHD memory aid.
 

@@ -2,17 +2,12 @@
 // GEMINI API INTEGRATION FOR ADHD MEMORY AID
 // ============================================
 
-// Step 1: Install the Gemini SDK
-// Run: npm install @google/generative-ai
-
-// Step 2: Create this file: src/services/geminiService.js
-// ============================================
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize Gemini API
-const API_KEY = "AIzaSyCVToU-mDVJqXlNovsUf2rCLCKIbrcM0LA";
+// Initialize Gemini API - SECURE VERSION
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
+const WORKING_MODEL = "models/gemini-2.5-flash"; // ✅ Confirmed working model
 
 // ============================================
 // 1. CHAT FUNCTIONALITY
@@ -20,9 +15,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export async function sendChatMessage(message, conversationHistory = []) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: WORKING_MODEL });
     
-    // Build conversation context
     const context = `You are an AI Memory Assistant for people with ADHD. 
 Your role is to:
 - Help users remember tasks and important information
@@ -53,7 +47,7 @@ Respond helpfully and concisely.`;
 
 export async function extractTasks(text) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: WORKING_MODEL });
     
     const prompt = `Extract all tasks, action items, and reminders from this text. For each task, identify:
 - Title (clear, concise)
@@ -80,7 +74,6 @@ If no tasks found, return: []`;
     const response = await result.response;
     const jsonText = response.text().trim();
     
-    // Extract JSON from markdown code blocks if present
     const jsonMatch = jsonText.match(/```json\s*([\s\S]*?)\s*```/) || 
                      jsonText.match(/\[[\s\S]*\]/);
     
@@ -102,7 +95,7 @@ If no tasks found, return: []`;
 
 export async function generateReminderSuggestions(task) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: WORKING_MODEL });
     
     const prompt = `For this task: "${task}", suggest:
 1. Best time to do it (considering ADHD optimal focus times)
@@ -140,7 +133,7 @@ Respond in JSON format:
 
 export async function analyzeMemoryPatterns(userHistory) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: WORKING_MODEL });
     
     const prompt = `Analyze this user's task history and provide insights:
 ${JSON.stringify(userHistory, null, 2)}
@@ -181,7 +174,7 @@ Respond in JSON format:
 
 export async function summarizeThoughts(text) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: WORKING_MODEL });
     
     const prompt = `Summarize these thoughts/notes into clear, organized bullet points.
 Make it ADHD-friendly: concise, actionable, and easy to scan.
@@ -205,7 +198,7 @@ Provide a clear summary with action items separated.`;
 
 export async function getADHDTip(category = "general") {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: WORKING_MODEL });
     
     const prompt = `Provide a helpful, evidence-based ADHD tip about: ${category}
 Make it:
@@ -222,45 +215,3 @@ Make it:
     return "Remember: You're doing great! Break tasks into smaller steps.";
   }
 }
-
-// ============================================
-// USAGE EXAMPLES
-// ============================================
-
-/*
-
-// Example 1: Chat
-const response = await sendChatMessage(
-  "I need to remember to call mom tomorrow",
-  [
-    { role: "user", content: "Hi" },
-    { role: "assistant", content: "Hello! How can I help you today?" }
-  ]
-);
-
-// Example 2: Extract Tasks
-const tasks = await extractTasks(
-  "I need to call the dentist, buy groceries, and finish my report by Friday"
-);
-console.log(tasks);
-
-// Example 3: Get Reminder Suggestion
-const suggestion = await generateReminderSuggestions("Take medication");
-console.log(suggestion);
-
-// Example 4: Memory Analysis
-const insights = await analyzeMemoryPatterns({
-  completedTasks: [...],
-  missedTasks: [...],
-  averageCompletionTime: "2 days"
-});
-
-// Example 5: Summarize
-const summary = await summarizeThoughts(
-  "Had a meeting today about the project. Need to finish the design by next week. Also thinking about changing the color scheme. Maybe blue? Not sure yet."
-);
-
-// Example 6: Get ADHD Tip
-const tip = await getADHDTip("time management");
-
-*/
