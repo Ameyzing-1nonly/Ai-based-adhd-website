@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ChatBot from "./chatbot/Chatbot";
 
 const App = () => {
   return (
@@ -9,7 +8,7 @@ const App = () => {
      <Navbar/>
       <div className="flex-grow">
         <Outlet />
-        <ChatBot/>
+        
       </div>
       <footer className="mt-auto">
         <Footer/>

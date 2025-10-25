@@ -141,18 +141,6 @@ const Navbar = () => {
               </li>
               <li>
                 <NavLink
-                  to="/voice"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-pink-600 dark:text-pink-400"
-                      : "text-gray-700 dark:text-gray-300"
-                  }
-                >
-                  Voice Tasks
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
                   to="/games"
                   className={({ isActive }) =>
                     isActive
@@ -160,7 +148,7 @@ const Navbar = () => {
                       : "text-gray-700 dark:text-gray-300"
                   }
                 >
-                  Memory Games
+                  Games
                 </NavLink>
               </li>
               <li>
@@ -277,19 +265,6 @@ const Navbar = () => {
                   }
                 >
                   AI Assistant
-                </NavLink>
-              </li>
-              <li className="mt-5 px-4">
-                <NavLink
-                  to="/voice"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-pink-600 dark:text-pink-400"
-                      : "text-gray-700 dark:text-gray-300"
-                  }
-                >
-                  Voice Tasks
                 </NavLink>
               </li>
               <li className="mt-5 px-4">
